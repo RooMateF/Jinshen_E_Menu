@@ -92,41 +92,57 @@ function setupEventListeners() {
     });
 
     // 返回按鈕
-    document.getElementById('back-to-types-btn').addEventListener('click', backToTypes);
+    const backBtn = document.getElementById('back-to-types-btn');
+    if (backBtn) backBtn.addEventListener('click', backToTypes);
 
     // 確認送單
-    document.getElementById('submit-order-btn').addEventListener('click', submitOrder);
+    const submitBtn = document.getElementById('submit-order-btn');
+    if (submitBtn) submitBtn.addEventListener('click', submitOrder);
 
     // 廚師登出
-    document.getElementById('kitchen-logout-btn').addEventListener('click', kitchenLogout);
+    const logoutBtn = document.getElementById('kitchen-logout-btn');
+    if (logoutBtn) logoutBtn.addEventListener('click', kitchenLogout);
 
     // 廚師密碼確認
-    document.getElementById('auth-submit-btn').addEventListener('click', verifyPassword);
-    document.getElementById('auth-password').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') verifyPassword();
-    });
-
-    // 30秒自動更新廚師面板
-    if (localStorage.getItem('isKitchen')) {
-        setInterval(refreshKitchenPanel, 30000);
+    const authSubmitBtn = document.getElementById('auth-submit-btn');
+    if (authSubmitBtn) {
+        authSubmitBtn.addEventListener('click', verifyPassword);
+        const authPasswordInput = document.getElementById('auth-password');
+        if (authPasswordInput) {
+            authPasswordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') verifyPassword();
+            });
+        }
     }
+
+    // 預約 Modal 按鈕
+    document.querySelectorAll('#reservation-modal .modal-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const type = e.currentTarget.dataset.type;
+            selectOrderType(type);
+            closeReservationModal();
+        });
+    });
 }
 
 // ==================== 廚師訪問 ====================
 
 function setupKitchenAccess() {
     // 點擊應用標題區域來啟用廚師模式
-    document.querySelector('.header').addEventListener('click', () => {
-        appState.adminClicks++;
-        if (appState.adminClicks >= 8) {
-            appState.adminClicks = 0;
-            openAuthModal();
-        }
-        // 5秒後重置計數
-        setTimeout(() => {
-            appState.adminClicks = 0;
-        }, 5000);
-    });
+    const headerElement = document.querySelector('.header');
+    if (headerElement) {
+        headerElement.addEventListener('click', () => {
+            appState.adminClicks++;
+            if (appState.adminClicks >= 8) {
+                appState.adminClicks = 0;
+                openAuthModal();
+            }
+            // 5秒後重置計數
+            setTimeout(() => {
+                appState.adminClicks = 0;
+            }, 5000);
+        });
+    }
 
     // 檢查是否已登入廚師模式
     if (localStorage.getItem('isKitchen')) {
@@ -135,31 +151,43 @@ function setupKitchenAccess() {
 }
 
 function openAuthModal() {
-    document.getElementById('auth-modal').style.display = 'flex';
-    document.getElementById('auth-password').focus();
+    const modal = document.getElementById('auth-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        const passwordInput = document.getElementById('auth-password');
+        if (passwordInput) passwordInput.focus();
+    }
 }
 
 function closeAuthModal() {
-    document.getElementById('auth-modal').style.display = 'none';
-    document.getElementById('auth-password').value = '';
+    const modal = document.getElementById('auth-modal');
+    if (modal) modal.style.display = 'none';
+    const passwordInput = document.getElementById('auth-password');
+    if (passwordInput) passwordInput.value = '';
 }
 
 function verifyPassword() {
-    const password = document.getElementById('auth-password').value;
+    const passwordInput = document.getElementById('auth-password');
+    const password = passwordInput ? passwordInput.value : '';
+    
     if (password === CONFIG.app.adminPassword) {
         localStorage.setItem('isKitchen', 'true');
         closeAuthModal();
         enterKitchenMode();
     } else {
         alert('密碼錯誤');
-        document.getElementById('auth-password').value = '';
+        if (passwordInput) passwordInput.value = '';
     }
 }
 
 function enterKitchenMode() {
     appState.isKitchenMode = true;
-    document.getElementById('customer-panel').style.display = 'none';
-    document.getElementById('kitchen-panel').style.display = 'flex';
+    const customerPanel = document.getElementById('customer-panel');
+    const kitchenPanel = document.getElementById('kitchen-panel');
+    
+    if (customerPanel) customerPanel.style.display = 'none';
+    if (kitchenPanel) kitchenPanel.style.display = 'flex';
+    
     refreshKitchenPanel();
 }
 
@@ -167,10 +195,16 @@ function kitchenLogout() {
     localStorage.removeItem('isKitchen');
     appState.isKitchenMode = false;
     appState.adminClicks = 0;
-    document.getElementById('kitchen-panel').style.display = 'none';
-    document.getElementById('customer-panel').style.display = 'flex';
-    document.getElementById('order-types-section').style.display = 'block';
-    document.getElementById('menu-section').style.display = 'none';
+    
+    const kitchenPanel = document.getElementById('kitchen-panel');
+    const customerPanel = document.getElementById('customer-panel');
+    const orderTypesSection = document.getElementById('order-types-section');
+    const menuSection = document.getElementById('menu-section');
+    
+    if (kitchenPanel) kitchenPanel.style.display = 'none';
+    if (customerPanel) customerPanel.style.display = 'flex';
+    if (orderTypesSection) orderTypesSection.style.display = 'block';
+    if (menuSection) menuSection.style.display = 'none';
 }
 
 // ==================== 菜單渲染 ====================
@@ -178,41 +212,49 @@ function kitchenLogout() {
 function renderMenu() {
     // 湯麵選項
     const noodleList = document.getElementById('noodle-list');
-    noodleList.innerHTML = CONFIG.menu.noodles.map(noodle =>
-        `<button class="modal-item-btn" onclick="selectNoodle('${noodle.id}', '${noodle.name}')">
-            <span class="modal-item-name">${noodle.name}</span>
-        </button>`
-    ).join('');
+    if (noodleList) {
+        noodleList.innerHTML = CONFIG.menu.noodles.map(noodle =>
+            `<button class="modal-item-btn" onclick="selectNoodle('${noodle.id}', '${noodle.name}')">
+                <span class="modal-item-name">${noodle.name}</span>
+            </button>`
+        ).join('');
+    }
 
     // 口味選項
     const flavorList = document.getElementById('flavor-list');
-    flavorList.innerHTML = CONFIG.menu.flavors.map(flavor =>
-        `<button class="modal-item-btn" onclick="selectFlavor('${flavor.id}', '${flavor.name}')">
-            <span class="modal-item-name">${flavor.name}</span>
-        </button>`
-    ).join('');
+    if (flavorList) {
+        flavorList.innerHTML = CONFIG.menu.flavors.map(flavor =>
+            `<button class="modal-item-btn" onclick="selectFlavor('${flavor.id}', '${flavor.name}')">
+                <span class="modal-item-name">${flavor.name}</span>
+            </button>`
+        ).join('');
+    }
 
     // 小菜選項
     const sidesList = document.getElementById('sides-list');
-    sidesList.innerHTML = CONFIG.menu.sides.map(side =>
-        `<button class="modal-item-btn" onclick="addSideToCart('${side.id}', '${side.name}', ${side.price})">
-            <span class="modal-item-name">${side.name}</span>
-            <span class="modal-item-price">NT$${side.price}</span>
-        </button>`
-    ).join('');
+    if (sidesList) {
+        sidesList.innerHTML = CONFIG.menu.sides.map(side =>
+            `<button class="modal-item-btn" onclick="addSideToCart('${side.id}', '${side.name}', ${side.price})">
+                <span class="modal-item-name">${side.name}</span>
+                <span class="modal-item-price">NT$${side.price}</span>
+            </button>`
+        ).join('');
+    }
 
     // 廚師面板 - 菜品管理
     const soldoutGrid = document.getElementById('soldout-grid');
-    const allItems = [
-        ...CONFIG.menu.noodles.map(n => ({ id: n.id, name: n.name })),
-        ...CONFIG.menu.flavors.map(f => ({ id: f.id, name: f.name })),
-        ...CONFIG.menu.sides.map(s => ({ id: s.id, name: s.name }))
-    ];
-    
-    soldoutGrid.innerHTML = allItems.map(item =>
-        `<button class="soldout-btn ${appState.soldOut.has(item.id) ? 'active' : ''}" 
-                onclick="toggleSoldOut('${item.id}')">${item.name}</button>`
-    ).join('');
+    if (soldoutGrid) {
+        const allItems = [
+            ...CONFIG.menu.noodles.map(n => ({ id: n.id, name: n.name })),
+            ...CONFIG.menu.flavors.map(f => ({ id: f.id, name: f.name })),
+            ...CONFIG.menu.sides.map(s => ({ id: s.id, name: s.name }))
+        ];
+        
+        soldoutGrid.innerHTML = allItems.map(item =>
+            `<button class="soldout-btn ${appState.soldOut.has(item.id) ? 'active' : ''}" 
+                    onclick="toggleSoldOut('${item.id}')">${item.name}</button>`
+        ).join('');
+    }
 }
 
 // ==================== 訂單類型 ====================
@@ -223,37 +265,37 @@ function selectOrderType(type) {
     appState.selectedNoodle = null;
     appState.selectedFlavor = null;
     
-    document.getElementById('order-types-section').style.display = 'none';
-    document.getElementById('menu-section').style.display = 'block';
+    const orderTypesSection = document.getElementById('order-types-section');
+    const menuSection = document.getElementById('menu-section');
+    
+    if (orderTypesSection) orderTypesSection.style.display = 'none';
+    if (menuSection) menuSection.style.display = 'block';
+    
     updateCartDisplay();
 }
 
 // ==================== 預約選擇 ====================
 
 function openReservationModal() {
-    document.getElementById('reservation-modal').style.display = 'flex';
+    const modal = document.getElementById('reservation-modal');
+    if (modal) modal.style.display = 'flex';
 }
 
 function closeReservationModal() {
-    document.getElementById('reservation-modal').style.display = 'none';
+    const modal = document.getElementById('reservation-modal');
+    if (modal) modal.style.display = 'none';
 }
-
-document.querySelectorAll('#reservation-modal .modal-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        const type = e.currentTarget.dataset.type;
-        selectOrderType(type);
-        closeReservationModal();
-    });
-});
 
 // ==================== 湯麵選擇 ====================
 
 function openNoodleModal() {
-    document.getElementById('noodle-modal').style.display = 'flex';
+    const modal = document.getElementById('noodle-modal');
+    if (modal) modal.style.display = 'flex';
 }
 
 function closeNoodleModal() {
-    document.getElementById('noodle-modal').style.display = 'none';
+    const modal = document.getElementById('noodle-modal');
+    if (modal) modal.style.display = 'none';
 }
 
 function selectNoodle(id, name) {
@@ -265,15 +307,19 @@ function selectNoodle(id, name) {
 // ==================== 口味選擇 ====================
 
 function openFlavorModal() {
+    const modal = document.getElementById('flavor-modal');
     const title = document.getElementById('flavor-modal-title');
-    title.textContent = appState.selectedNoodle ? 
-        `${appState.selectedNoodle.name} - 選擇口味` : 
-        '選擇口味';
-    document.getElementById('flavor-modal').style.display = 'flex';
+    
+    if (title && appState.selectedNoodle) {
+        title.textContent = `${appState.selectedNoodle.name} - 選擇口味`;
+    }
+    
+    if (modal) modal.style.display = 'flex';
 }
 
 function closeFlavorModal() {
-    document.getElementById('flavor-modal').style.display = 'none';
+    const modal = document.getElementById('flavor-modal');
+    if (modal) modal.style.display = 'none';
 }
 
 function selectFlavor(id, name) {
@@ -298,11 +344,13 @@ function selectFlavor(id, name) {
 // ==================== 小菜 ====================
 
 function openSidesModal() {
-    document.getElementById('sides-modal').style.display = 'flex';
+    const modal = document.getElementById('sides-modal');
+    if (modal) modal.style.display = 'flex';
 }
 
 function closeSidesModal() {
-    document.getElementById('sides-modal').style.display = 'none';
+    const modal = document.getElementById('sides-modal');
+    if (modal) modal.style.display = 'none';
 }
 
 function addSideToCart(id, name, price) {
@@ -313,7 +361,6 @@ function addSideToCart(id, name, price) {
         price
     });
     updateCartDisplay();
-    // 保持模態打開，讓用戶繼續添加
 }
 
 // ==================== 購物車 ====================
@@ -321,6 +368,8 @@ function addSideToCart(id, name, price) {
 function updateCartDisplay() {
     const cartSummary = document.getElementById('cart-summary');
     const cartItems = document.getElementById('cart-items');
+    
+    if (!cartSummary || !cartItems) return;
     
     if (appState.cart.length === 0) {
         cartSummary.style.display = 'none';
@@ -347,8 +396,12 @@ function backToTypes() {
     appState.selectedNoodle = null;
     appState.selectedFlavor = null;
     
-    document.getElementById('order-types-section').style.display = 'block';
-    document.getElementById('menu-section').style.display = 'none';
+    const orderTypesSection = document.getElementById('order-types-section');
+    const menuSection = document.getElementById('menu-section');
+    
+    if (orderTypesSection) orderTypesSection.style.display = 'block';
+    if (menuSection) menuSection.style.display = 'none';
+    
     updateCartDisplay();
 }
 
@@ -360,7 +413,8 @@ function submitOrder() {
         return;
     }
     
-    const customerName = document.getElementById('customer-name').value || '匿名';
+    const customerNameInput = document.getElementById('customer-name');
+    const customerName = customerNameInput ? customerNameInput.value || '匿名' : '匿名';
     
     const order = {
         id: `ORDER_${Date.now()}`,
@@ -380,7 +434,7 @@ function submitOrder() {
     // 重置
     appState.cart = [];
     appState.currentOrderType = null;
-    document.getElementById('customer-name').value = '';
+    if (customerNameInput) customerNameInput.value = '';
     backToTypes();
 }
 
@@ -403,6 +457,7 @@ function refreshKitchenPanel() {
 
 function renderOrders(containerId, orders) {
     const container = document.getElementById(containerId);
+    if (!container) return;
     
     if (orders.length === 0) {
         container.innerHTML = '<div class="empty-state"><p class="empty-state-text">暫無訂單</p></div>';
@@ -415,7 +470,7 @@ function renderOrders(containerId, orders) {
                 <span class="order-number">#${idx + 1}</span>
                 <span class="order-time">${order.timestamp}</span>
             </div>
-            ${order.customerName !== '匿名' ? `<div class="order-customer">👤 ${order.customerName}</div>` : ''}
+            ${order.customerName !== '匿名' ? `<div class="order-customer">${order.customerName}</div>` : ''}
             <div class="order-items">
                 ${order.items.map(item => 
                     `<div class="order-item ${appState.soldOut.has(item.id) ? 'soldout' : ''}">
@@ -494,24 +549,42 @@ function loadSoldOut() {
     appState.soldOut = new Set(data ? JSON.parse(data) : []);
 }
 
-// ==================== Modal 關閉 ====================
+// ==================== Modal 關閉 - 改進版本 ====================
 
-function closeAllModals() {
-    document.querySelectorAll('.modal').forEach(modal => {
-        modal.style.display = 'none';
-    });
-}
-
-// 點擊背景關閉 Modal
+// 點擊 Modal 背景時關閉（只有點擊背景才關閉）
 document.addEventListener('click', (e) => {
+    // 只處理有 modal 類別的元素
+    if (!e.target || !e.target.classList) return;
+    
     if (e.target.classList.contains('modal')) {
-        e.target.style.display = 'none';
+        // 獲取 Modal 內容
+        const modalContent = e.target.querySelector('.modal-content');
+        
+        if (!modalContent) {
+            // 沒有內容，直接關閉
+            e.target.style.display = 'none';
+            return;
+        }
+        
+        // 計算點擊位置是否在 Modal 內容外
+        const rect = modalContent.getBoundingClientRect();
+        const clickX = e.clientX;
+        const clickY = e.clientY;
+        
+        // 檢查點擊是否在內容外（背景）
+        const isOutside = clickX < rect.left || clickX > rect.right || 
+                         clickY < rect.top || clickY > rect.bottom;
+        
+        if (isOutside) {
+            e.target.style.display = 'none';
+        }
     }
-});
+}, false);
 
-// 防止 Modal 內容點擊時關閉
-document.addEventListener('click', (e) => {
-    if (e.target.closest('.modal-content')) {
-        e.stopPropagation();
+// ==================== 30秒自動更新 ====================
+
+setInterval(() => {
+    if (appState.isKitchenMode) {
+        refreshKitchenPanel();
     }
-}, true);
+}, 30000);
