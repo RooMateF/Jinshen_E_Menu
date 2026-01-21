@@ -2,7 +2,17 @@
   "app": {
     "name": "謹聖廚房",
     "tagline": "招牌湯麵",
-    "adminPassword": "000000"
+    "adminPassword": "",
+    "showKitchenButton": true
+  },
+  "firebase": {
+    "projectId": "jinsenapp",
+    "apiKey": "YOUR_API_KEY_HERE",
+    "authDomain": "jinsenapp.firebaseapp.com",
+    "databaseURL": "https://jinsenapp.firebaseio.com",
+    "storageBucket": "jinsenapp.appspot.com",
+    "messagingSenderId": "YOUR_MESSAGING_SENDER_ID",
+    "appId": "YOUR_APP_ID"
   },
   "menu": {
     "noodles": [
@@ -18,7 +28,7 @@
     "sides": [
       { "id": "side_1", "name": "炸物拼盤", "price": 30 },
       { "id": "side_2", "name": "炸響鈴", "price": 20 },
-      { "id": "side_3", "name": "燙青菜", "price": 25 }
+      { "id": "side_3", "name": "燫青菜", "price": 25 }
     ]
   },
   "orderTypes": {

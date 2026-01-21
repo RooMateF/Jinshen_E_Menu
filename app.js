@@ -4,7 +4,17 @@ let CONFIG = {
     app: {
         name: "謹聖廚房",
         tagline: "招牌湯麵",
-        adminPassword: "000000"
+        adminPassword: "",
+        showKitchenButton: true
+    },
+    firebase: {
+        projectId: "jinsenapp",
+        apiKey: "YOUR_API_KEY_HERE",
+        authDomain: "jinsenapp.firebaseapp.com",
+        databaseURL: "https://jinsenapp.firebaseio.com",
+        storageBucket: "jinsenapp.appspot.com",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID"
     },
     menu: {
         noodles: [
@@ -62,6 +72,19 @@ function init() {
     renderMenu();
     setupEventListeners();
     setupKitchenAccess();
+    initKitchenButton();
+}
+
+// ==================== 廚師快速進入按鈕 ====================
+
+function initKitchenButton() {
+    const kitchenBtn = document.getElementById('kitchen-quick-btn');
+    if (kitchenBtn && CONFIG.app.showKitchenButton) {
+        kitchenBtn.style.display = 'block';
+        kitchenBtn.addEventListener('click', () => {
+            openAuthModal();
+        });
+    }
 }
 
 // ==================== 事件監聽 ====================
@@ -128,7 +151,7 @@ function setupEventListeners() {
 // ==================== 廚師訪問 ====================
 
 function setupKitchenAccess() {
-    // 點擊應用標題區域來啟用廚師模式
+    // 點擊應用標題區域來啟用廚師模式（備用方法，點 8 次）
     const headerElement = document.querySelector('.header');
     if (headerElement) {
         headerElement.addEventListener('click', () => {
@@ -155,7 +178,10 @@ function openAuthModal() {
     if (modal) {
         modal.style.display = 'flex';
         const passwordInput = document.getElementById('auth-password');
-        if (passwordInput) passwordInput.focus();
+        if (passwordInput) {
+            passwordInput.value = '';
+            passwordInput.focus();
+        }
     }
 }
 
@@ -170,6 +196,15 @@ function verifyPassword() {
     const passwordInput = document.getElementById('auth-password');
     const password = passwordInput ? passwordInput.value : '';
     
+    // 如果密碼設置為空值，直接進入
+    if (CONFIG.app.adminPassword === '') {
+        localStorage.setItem('isKitchen', 'true');
+        closeAuthModal();
+        enterKitchenMode();
+        return;
+    }
+    
+    // 否則檢查密碼
     if (password === CONFIG.app.adminPassword) {
         localStorage.setItem('isKitchen', 'true');
         closeAuthModal();
