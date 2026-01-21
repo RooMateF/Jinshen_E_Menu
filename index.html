@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>謹聖廚房 - 招牌湯麵</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 客人面板 -->
+    <div id="customer-panel" class="main-container">
+        <!-- 頂部 -->
+        <header class="header">
+            <h1 class="app-title">謹聖廚房</h1>
+            <p class="app-subtitle">招牌湯麵</p>
+        </header>
+
+        <!-- 主要內容區 -->
+        <div class="content-area">
+            <!-- 訂單類型選擇 -->
+            <div id="order-types-section" class="section">
+                <h2 class="section-title">選擇訂單類型</h2>
+                <div class="order-types-grid">
+                    <button class="order-type-btn" data-type="dine_in">
+                        <span class="order-type-label">現場內用</span>
+                    </button>
+                    <button class="order-type-btn" data-type="takeaway">
+                        <span class="order-type-label">現場外帶</span>
+                    </button>
+                    <button class="order-type-btn" data-type="reservation">
+                        <span class="order-type-label">預約訂單</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 菜單選擇區 -->
+            <div id="menu-section" class="section" style="display: none;">
+                <div class="menu-grid">
+                    <!-- 湯麵 -->
+                    <div class="menu-category">
+                        <h3 class="menu-category-title">謹聖廚房招牌湯麵</h3>
+                        <button class="menu-item-btn noodle-btn" data-section="noodles">
+                            <span class="menu-item-name">點餐</span>
+                        </button>
+                    </div>
+
+                    <!-- 小菜 -->
+                    <div class="menu-category">
+                        <h3 class="menu-category-title">小菜</h3>
+                        <button class="menu-item-btn side-btn" data-section="sides">
+                            <span class="menu-item-name">點餐</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 購物車摘要 -->
+                <div class="cart-summary" id="cart-summary" style="display: none;">
+                    <h3 class="cart-title">訂單摘要</h3>
+                    <div id="cart-items" class="cart-items-list"></div>
+                    <div class="cart-footer">
+                        <input type="text" id="customer-name" placeholder="名字 (選填)" maxlength="10" class="name-input">
+                        <button id="submit-order-btn" class="submit-btn">確認送單</button>
+                    </div>
+                </div>
+
+                <!-- 返回按鈕 -->
+                <button id="back-to-types-btn" class="back-btn">返回</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 預約類型選擇 Modal -->
+    <div id="reservation-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">選擇預約類型</h2>
+            <div class="modal-buttons">
+                <button class="modal-btn" data-type="reservation_dine_in">預約內用</button>
+                <button class="modal-btn" data-type="reservation_takeaway">預約外帶</button>
+            </div>
+            <button class="modal-close-btn" onclick="closeReservationModal()">取消</button>
+        </div>
+    </div>
+
+    <!-- 湯麵選擇 Modal -->
+    <div id="noodle-modal" class="modal">
+        <div class="modal-content modal-medium">
+            <h2 class="modal-title">選擇麵條</h2>
+            <div class="modal-items" id="noodle-list"></div>
+            <button class="modal-close-btn" onclick="closeNoodleModal()">關閉</button>
+        </div>
+    </div>
+
+    <!-- 口味選擇 Modal -->
+    <div id="flavor-modal" class="modal">
+        <div class="modal-content modal-medium">
+            <h2 class="modal-title" id="flavor-modal-title">選擇口味</h2>
+            <div class="modal-items" id="flavor-list"></div>
+            <button class="modal-close-btn" onclick="closeFlavorModal()">返回</button>
+        </div>
+    </div>
+
+    <!-- 小菜選擇 Modal -->
+    <div id="sides-modal" class="modal">
+        <div class="modal-content modal-medium">
+            <h2 class="modal-title">加點小菜</h2>
+            <div class="modal-items" id="sides-list"></div>
+            <button class="modal-close-btn" onclick="closeSidesModal()">關閉</button>
+        </div>
+    </div>
+
+    <!-- 廚師面板 (隱藏) -->
+    <div id="kitchen-panel" class="kitchen-panel" style="display: none;">
+        <div class="kitchen-header">
+            <h1 class="kitchen-title">廚師面板</h1>
+            <button id="kitchen-logout-btn" class="logout-btn">登出</button>
+        </div>
+
+        <div class="kitchen-content">
+            <!-- 菜品管理 -->
+            <div class="kitchen-section">
+                <h2 class="kitchen-section-title">菜品管理</h2>
+                <div class="soldout-grid" id="soldout-grid"></div>
+            </div>
+
+            <!-- 訂單區域 -->
+            <div class="orders-container">
+                <!-- 現場訂單 -->
+                <div class="orders-section">
+                    <h2 class="orders-title">現場訂單</h2>
+                    <div id="live-orders" class="orders-list"></div>
+                </div>
+
+                <!-- 預約訂單 -->
+                <div class="orders-section">
+                    <h2 class="orders-title">預約訂單</h2>
+                    <div id="reservation-orders" class="orders-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 廚師認證 Modal -->
+    <div id="auth-modal" class="modal" style="display: none;">
+        <div class="modal-content modal-small">
+            <h2 class="modal-title">廚師面板</h2>
+            <p class="auth-label">請輸入密碼</p>
+            <input type="password" id="auth-password" placeholder="密碼" class="auth-input">
+            <button id="auth-submit-btn" class="modal-btn">進入</button>
+            <button class="modal-close-btn" onclick="closeAuthModal()">取消</button>
+        </div>
+    </div>
+
+    <script src="config.json" type="application/json" id="config-script"></script>
+    <script src="app.js"></script>
+</body>
+</html>

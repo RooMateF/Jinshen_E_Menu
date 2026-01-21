@@ -1,0 +1,43 @@
+{
+  "app": {
+    "name": "謹聖廚房",
+    "tagline": "招牌湯麵",
+    "adminPassword": "000000"
+  },
+  "menu": {
+    "noodles": [
+      { "id": "noodle_1", "name": "手打" },
+      { "id": "noodle_2", "name": "細麵" },
+      { "id": "noodle_3", "name": "冬粉" }
+    ],
+    "flavors": [
+      { "id": "flavor_1", "name": "原味" },
+      { "id": "flavor_2", "name": "蝦醬" },
+      { "id": "flavor_3", "name": "藥膳" }
+    ],
+    "sides": [
+      { "id": "side_1", "name": "炸物拼盤", "price": 30 },
+      { "id": "side_2", "name": "炸響鈴", "price": 20 },
+      { "id": "side_3", "name": "燙青菜", "price": 25 }
+    ]
+  },
+  "orderTypes": {
+    "dine_in": { "label": "現場內用", "color": "#8B6F47" },
+    "takeaway": { "label": "現場外帶", "color": "#A0826D" },
+    "reservation_dine_in": { "label": "預約內用", "color": "#9B7D6F" },
+    "reservation_takeaway": { "label": "預約外帶", "color": "#8B7355" }
+  },
+  "colors": {
+    "primary": "#5D4E37",
+    "secondary": "#8B6F47",
+    "accent": "#A0826D",
+    "light": "#F5F1EB",
+    "dark": "#2C1810",
+    "border": "#D4C4B9",
+    "text": "#3E2723"
+  },
+  "storage": {
+    "ordersKey": "noodle_orders",
+    "soldOutKey": "noodle_soldout"
+  }
+}
